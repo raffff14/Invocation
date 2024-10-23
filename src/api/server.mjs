@@ -86,7 +86,8 @@ app.post('/api/register', [
       city: clientInfo.city,
       region: clientInfo.region,
       country: clientInfo.country_name,
-      org: clientInfo.org,
+      org: clientInfo.isp,
+      // org: clientInfo.org,
       latitude: clientInfo.latitude,
       longitude: clientInfo.longitude,
       deviceInfo: deviceInfo
@@ -140,7 +141,7 @@ app.post('/api/login', [
       city: clientInfo.city,
       region: clientInfo.region,
       country: clientInfo.country_name,
-      org: clientInfo.org,
+      org: clientInfo.isp,
       latitude: clientInfo.latitude,
       longitude: clientInfo.longitude,
       deviceInfo: deviceInfo

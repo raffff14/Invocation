@@ -60,7 +60,7 @@ const LoginLogTable: React.FC = () => {
                 <th className="w-1/7 px-4 py-3 text-left text-xs font-medium text-yellow-400 uppercase">User</th>
                 <th className="w-1/7 px-4 py-3 text-left text-xs font-medium text-yellow-400 uppercase">IP</th>
                 <th className="w-1/7 px-4 py-3 text-left text-xs font-medium text-yellow-400 uppercase">Location</th>
-                <th className="w-1/7 px-4 py-3 text-left text-xs font-medium text-yellow-400 uppercase">Organization</th>
+                <th className="w-1/7 px-4 py-3 text-left text-xs font-medium text-yellow-400 uppercase">ISP</th>
                 <th className="w-1/7 px-4 py-3 text-left text-xs font-medium text-yellow-400 uppercase">Coordinates</th>
                 <th className="w-1/7 px-4 py-3 text-left text-xs font-medium text-yellow-400 uppercase">Device Info</th>
               </tr>
