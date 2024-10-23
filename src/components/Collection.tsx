@@ -16,6 +16,7 @@ const Collection: React.FC<CollectionProps> = ({ account }) => {
 
   useEffect(() => {
     const fetchCollection = async () => {
+      console.log(account, "zzzz")
       if (!account) return;
 
       setLoading(true);

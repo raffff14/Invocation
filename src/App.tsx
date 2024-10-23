@@ -7,8 +7,7 @@ import Register from "./components/user/Register";
 import ChangePassword from "./components/user/ChangePassword";
 import Gacha from "./components/Gacha";
 import Collection from "./components/Collection";
-import Marketplace from "./components/Marketplace";
-import Create from "./components/Create";
+import About from "./components/About";
 import LoginLogTable from './components/LoginLogTable';
 import "./App.css";
 
@@ -115,8 +114,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Gacha />} />
               <Route path="/collections" element={<Collection />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/create" element={<Create />} />
+              <Route path="/about" element={<About />} />
               <Route path="/change-password" element={<ChangePassword />} />
               <Route path="/login-logs" element={<LoginLogTable />} />
               <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,3 +1,6 @@
+/// REPLACE FOR ABOUT PAGE
+
+
 import React, { useState, useEffect } from "react";
 import { Character } from "../types";
 import { Star } from "lucide-react";
