@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Sparkles } from "lucide-react";
 import GachaCard from "./GachaCard";
-import AdComponent from './AdComponent'; // Import the AdComponent
-
 import { Character, Item, Metadata } from "./types";
 import axios from 'axios';
 
@@ -119,7 +117,9 @@ function Gacha({}: GachaProps) {
         className="w-full h-auto"
       />
 
-      <AdComponent />
+      {/* Ad Component */}
+      <div id="container-f49f5f35a629b31aaf9ba8a5189fb849"></div>
+
       <div className="relative w-full h-screen overflow-hidden video-wrapper">
         <video
           src="images/ROLL.mp4"
@@ -180,4 +180,12 @@ function Gacha({}: GachaProps) {
           <div className="flex flex-wrap justify-center gap-4">
             {pulledItems.map((item) => (
               <GachaCard key={item.id} item={item} />
-            ))}
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Gacha;
