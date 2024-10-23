@@ -159,8 +159,7 @@ function Gacha({}: GachaProps) {
         <div className="ad-container absolute inset-0 flex  justify-center"></div>
       </div>
 
-      {/* Ad Component */}
-      <div id="container-f49f5f35a629b31aaf9ba8a5189fb849"></div>
+      
       <div className="relative w-full h-screen overflow-hidden video-wrapper">
         <video
           src="images/ROLL.mp4"
@@ -175,7 +174,7 @@ function Gacha({}: GachaProps) {
           
           <button
               onClick={pullGacha}
-              className="bg-gradient-to-r from-blue-950 to-blue-900 text-white font-bold py-4 px-8 rounded-lg flex items-center justify-center w-auto hover:from-blue-500 hover:to-blue-600 transition duration-300 transform hover:scale-105"
+              className="bg-gradient-to-r from-blue-950 to-blue-700 text-white font-bold py-4 px-8 rounded-lg flex items-center justify-center w-auto hover:from-blue-500 hover:to-blue-600 transition duration-300 transform hover:scale-105"
             >
             <Sparkles className="w-5 h-5" />
             <span className="mx-2">
