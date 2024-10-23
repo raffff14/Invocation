@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema({
   balance: { type: Number, default: 10 },
   registrationDate: { type: Date, default: Date.now },
   isFirstLogin: { type: Boolean, default: true },
-  collection: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Token' }]
+  collection: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Card' }]
 });
 
 export default mongoose.model('User', UserSchema);

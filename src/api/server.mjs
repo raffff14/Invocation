@@ -369,10 +369,24 @@ app.post('/api/marketplace/buy', authenticateToken, async (req, res) => {
   }
 });
 
-// Get user's collection
-app.get('/api/collection/:userId', async (req, res) => {
+// Middleware to verify JWT token and set user in request
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
+// Adjusted endpoint to use authenticated user
+app.get('/api/collection', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).populate('collection');
+    const user = await User.findById(req.user.id).populate('collection');
     res.json(user.collection);
   } catch (error) {
     console.error('Error fetching collection:', error);
@@ -390,20 +404,6 @@ app.get('/api/marketplace/listings', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch listings' });
   }
 });
-
-// Middleware to verify JWT token
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (token == null) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-}
 
 // Change password route
 app.post('/api/changepassword', authenticateToken, [

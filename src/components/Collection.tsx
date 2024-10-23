@@ -4,31 +4,28 @@ import axios from 'axios';
 import GachaCard from "./GachaCard";
 import { Character, Item } from "../types"; // Adjust the import based on your project structure
 
-interface CollectionProps {
-  account: string | null;
-}
-
 type CollectionItem = (Character | Item) & { isListed?: boolean; price?: string };
 
-const Collection: React.FC<CollectionProps> = ({ account }) => {
+const Collection: React.FC = () => {
   const [collection, setCollection] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCollection = async () => {
-      console.log(account, "zzzz")
-      if (!account) return;
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
       setLoading(true);
       try {
-        const response = await axios.get(`/api/collection/${account}`, {
+        // Assuming the server can extract user ID from the token
+        const response = await axios.get(`/api/collection`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${token}`
           }
         });
         const items: CollectionItem[] = response.data.map((item: any) => ({
           ...item,
-          image: item.image.startsWith('http') ? item.image : `https://your-s3-bucket-url.s3.amazonaws.com/${item.image}`
+          image: item.image.startsWith('http') ? item.image : `https://genshin-cards.s3.amazonaws.com/${item.image}`
         }));
         setCollection(items);
       } catch (error) {
@@ -39,21 +36,27 @@ const Collection: React.FC<CollectionProps> = ({ account }) => {
     };
 
     fetchCollection();
-  }, [account]);
+  }, []);
 
   if (loading) {
     return <div>Loading your collection...</div>;
   }
 
   return (
-    <div>
-      <h2>Your Collection</h2>
-      <div>
+    <div className="mt-12">
+      <h2 className="text-white text-xl font-bold mb-4">Your Collection</h2>
+      <div className="flex flex-wrap justify-center gap-4">
         {collection.length === 0 ? (
-          <p>No items collected yet.</p>
+          <p className="text-white">No items collected yet.</p>
         ) : (
-          collection.map(item => (
-            <GachaCard key={item.id} item={item} />
+          collection.map((item) => (
+            <div key={item.id} className="relative group">
+              <GachaCard 
+                item={item} 
+                isListed={item.isListed} 
+                price={item.price}
+              />
+            </div>
           ))
         )}
       </div>

@@ -18,6 +18,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userBalance, setUserBalance] = useState<number>(0);
+  const [account, setAccount] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -51,6 +52,19 @@ function App() {
     setIsAuthenticated(false);
     setUserBalance(0);
   };
+
+  useEffect(() => {
+    // Simulate fetching account data
+    const fetchAccount = async () => {
+      // Example: Fetch account from local storage or API
+      const accountFromStorage = localStorage.getItem("account");
+      if (accountFromStorage) {
+        setAccount(accountFromStorage);
+      }
+    };
+
+    fetchAccount();
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -113,7 +127,7 @@ function App() {
 
             <Routes>
               <Route path="/" element={<Gacha />} />
-              <Route path="/collections" element={<Collection />} />
+              <Route path="/collections" element={<Collection account={account} />} />
               <Route path="/about" element={<About />} />
               <Route path="/change-password" element={<ChangePassword />} />
               <Route path="/login-logs" element={<LoginLogTable />} />
