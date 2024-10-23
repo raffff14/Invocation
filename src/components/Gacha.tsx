@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Sparkles } from "lucide-react";
+import { Coins, Sparkles } from "lucide-react";
 import GachaCard from "./GachaCard";
 import { Character, Item, Metadata } from "./types";
 import axios from 'axios';
@@ -109,17 +109,58 @@ function Gacha({}: GachaProps) {
     }
   };
 
+  useEffect(() => {
+    // Create and configure the ad options
+    const atOptionsScript = document.createElement('script');
+    atOptionsScript.type = "text/javascript";
+    atOptionsScript.text = `
+      atOptions = {
+        'key' : '29c7ae6e74bda21ea49d7327f05d3f1f',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    `;
+    document.head.appendChild(atOptionsScript);
+
+    // Create and append the ad script to the ad-container
+    const script2 = document.createElement('script');
+    script2.src = "//www.highperformanceformat.com/29c7ae6e74bda21ea49d7327f05d3f1f/invoke.js";
+    script2.async = true;
+    script2.setAttribute("data-cfasync", "false");
+    
+    const adContainer = document.querySelector('.ad-container');
+    if (adContainer) {
+        
+      adContainer.appendChild(script2);
+    }
+
+    return () => {
+      // Cleanup the scripts when the component unmounts
+      if (adContainer) {
+        adContainer.removeChild(script2);
+      }
+    };
+  }, []);
+
   return (
     <div className="flex flex-col justify-center">
-      <img
-        src="images/landing.png"
-        alt="Landing"
-        className="w-full h-auto"
-      />
+      {/* Ad placeholder container */}
+      
+      <div className="relative w-full h-screen overflow-hidden video-wrapper">
+        {/* Image that will have an overlay */}
+        <img
+          src="images/landing.png"
+          alt="Landing"
+          className="w-full h-auto"
+        />
+        {/* Overlay Ad container */}
+        <div className="ad-container absolute inset-0 flex  justify-center"></div>
+      </div>
 
       {/* Ad Component */}
       <div id="container-f49f5f35a629b31aaf9ba8a5189fb849"></div>
-
       <div className="relative w-full h-screen overflow-hidden video-wrapper">
         <video
           src="images/ROLL.mp4"
@@ -129,22 +170,27 @@ function Gacha({}: GachaProps) {
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-none"
           style={{ width: "100vw", height: "100vh", objectFit: "cover" }}
         />
-
+        
         <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex space-x-4">
+          
           <button
-            onClick={pullGacha}
-            className="bg-gradient-to-r from-blue-950 to-blue-900 text-white font-bold py-4 px-8 rounded-lg flex items-center space-x-2 hover:from-blue-500 hover:to-blue-600 transition duration-300 transform hover:scale-105"
-          >
+              onClick={pullGacha}
+              className="bg-gradient-to-r from-blue-950 to-blue-900 text-white font-bold py-4 px-8 rounded-lg flex items-center justify-center w-auto hover:from-blue-500 hover:to-blue-600 transition duration-300 transform hover:scale-105"
+            >
             <Sparkles className="w-5 h-5" />
-            <span>1x Summon (Free)</span>
+            <span className="mx-2">
+              1x Summon
+            </span>
             <Sparkles className="w-5 h-5" />
           </button>
           <button 
             onClick={multiPullGacha}
-            className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold py-4 px-8 rounded-lg flex items-center space-x-2 hover:from-yellow-500 hover:to-orange-600 transition duration-300 transform hover:scale-105"
+            className="bg-gradient-to-r from-yellow-600 to-orange-500 text-white font-bold py-4 px-8 rounded-lg flex items-center justify-center w-auto hover:from-yellow-500 hover:to-orange-600 transition duration-300 transform hover:scale-105"
           >
             <Sparkles className="w-5 h-5" />
-            <span>10x Summon (Free)</span>
+            <span className="mx-2">
+              10x Summons
+            </span>
             <Sparkles className="w-5 h-5" />
           </button>
         </div>
