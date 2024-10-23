@@ -28,6 +28,41 @@ function App() {
       fetchUserBalance();
     }
     setIsLoading(false);
+    if (isAuthenticated){
+
+      const script2 = document.createElement('script');
+      script2.src = "//www.highperformanceformat.com/29c7ae6e74bda21ea49d7327f05d3f1f/invoke.js";
+      script2.async = true;
+      script2.setAttribute("data-cfasync", "false");
+      
+      // Add the atOptions object
+      const atOptionsScript = document.createElement('script');
+      atOptionsScript.type = "text/javascript";
+      atOptionsScript.text = `
+        atOptions = {
+          'key' : '29c7ae6e74bda21ea49d7327f05d3f1f',
+          'format' : 'iframe',
+          'height' : 90,
+          'width' : 728,
+          'params' : {}
+        };
+      `;
+      document.head.appendChild(atOptionsScript);
+      document.body.appendChild(script2);
+
+      const script3 = document.createElement('script');
+      script3.src = "//pl24782732.profitablecpmrate.com/f49f5f35a629b31aaf9ba8a5189fb849/invoke.js";
+      script3.async = true;
+      script3.setAttribute("data-cfasync", "false");
+      document.body.appendChild(script3);
+
+      return () => {
+        // Cleanup the scripts when the component unmounts
+        document.head.removeChild(atOptionsScript)
+        document.body.removeChild(script2);
+        document.body.removeChild(script3);
+      };
+    }
   }, [isAuthenticated]);
 
   const fetchUserBalance = async () => {
@@ -74,11 +109,20 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900">
         {!isAuthenticated ? (
-          <Routes>
-            <Route path="/login" element={<Login onLogin={login} />} />
-            <Route path="/register" element={<Register onRegister={login} />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
+            <div className="relative min-h-screen">
+              <video autoPlay muted loop className="absolute w-full h-full object-cover">
+                <source src="images/mainbg.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              <div className="relative z-10">
+                <Routes>
+                  <Route path="/login" element={<Login onLogin={login} />} />
+                  <Route path="/register" element={<Register onRegister={login} />} />
+                  <Route path="*" element={<Navigate to="/login" replace />} />
+                </Routes>
+              </div>
+            </div>
+            
         ) : (
           <>
             <header className="sticky top-0 z-50 flex justify-between items-center bg-black bg-opacity-50 p-3 rounded-lg">
@@ -91,10 +135,10 @@ function App() {
                 DinoNFT Gacha
               </h1>
               <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold px-4 py-2 rounded-full flex items-center">
+                {/* <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold px-4 py-2 rounded-full flex items-center">
                   <Coins className="w-5 h-5 mr-2" />
-                  <span>{userBalance.toFixed(3)}</span>
-                </div>
+                  <span>{userBalance.toFixed(0)}</span>
+                </div> */}
                 
                 <Link
                   to="/"
