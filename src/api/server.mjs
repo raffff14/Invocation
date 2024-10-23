@@ -40,13 +40,17 @@ app.post('/api/register', [
   body('name').notEmpty().trim().escape(),
   body('email').isEmail().normalizeEmail(),
   body('password').isLength({ min: 6 }),
+  body('birthday').isDate().withMessage('Invalid date format'), // Validate birthday as a date
+  body('gender').isIn(['male', 'female', 'other']).withMessage('Invalid gender'), // Validate gender
+  body('number').isMobilePhone().withMessage('Invalid phone number'), // Validate mobile phone number
+  body('address').notEmpty().withMessage('Address is required'), // Validate address
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, email, password, clientInfo, deviceInfo } = req.body;
+  const { name, email, password, clientInfo, deviceInfo, birthday, gender, number, address } = req.body;
 
   try {
     // Check if user already exists
@@ -66,7 +70,10 @@ app.post('/api/register', [
       password: hashedPassword,
       clientInfo: JSON.stringify(clientInfo),
       deviceInfo: JSON.stringify(deviceInfo),
-      balance: 10, // Initial balance
+      birthday, // Store the birthday
+      gender,   // Store the gender
+      number,   // Store the phone number
+      address, // Store the address
       isFirstLogin: true
     });
 
@@ -168,9 +175,9 @@ app.post('/api/gacha/pull', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (user.balance < 0.005) {
-      return res.status(400).json({ error: 'Insufficient balance' });
-    }
+    // if (user.balance < 1) {
+    //   return res.status(400).json({ error: 'Insufficient balance' });
+    // }
 
     // Get all available cards
     const allCards = await Card.find();
@@ -207,7 +214,7 @@ app.post('/api/gacha/pull', authenticateToken, async (req, res) => {
     const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
 
     // Update user balance and collection
-    user.balance -= 0.005;
+    // user.balance -= 1;
     user.collection.push(randomCard._id);
     await user.save();
 
@@ -235,9 +242,9 @@ app.post('/api/gacha/multi-pull', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (user.balance < 0.05) {  // 10 pulls at 0.005 each
-      return res.status(400).json({ error: 'Insufficient balance' });
-    }
+    // if (user.balance < 10) {  // 10 pulls at 0.005 each
+    //   return res.status(400).json({ error: 'Insufficient balance' });
+    // }
 
     // Get all available cards
     const allCards = await Card.find();
@@ -253,6 +260,7 @@ app.post('/api/gacha/multi-pull', authenticateToken, async (req, res) => {
     };
 
     const pulledCards = [];
+    // user.balance -= 10;
 
     for (let i = 0; i < 10; i++) {
       let selectedRarity;
@@ -289,10 +297,9 @@ app.post('/api/gacha/multi-pull', authenticateToken, async (req, res) => {
 
       // Add card to user's collection
       user.collection.push(randomCard._id);
+
     }
 
-    // Update user balance
-    user.balance -= 0.05;
     await user.save();
 
     res.json(pulledCards);

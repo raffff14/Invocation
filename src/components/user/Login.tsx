@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
 // For Vite, use import.meta.env instead of process.env
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const IPGEOLOCATION_API_KEY = import.meta.env.VITE_IPGEOLOCATION_API_KEY; // Ensure you have this in your environment variables
 
 interface LoginProps {
   onLogin: (token: string) => void;
@@ -27,26 +28,25 @@ function Login({ onLogin }: LoginProps) {
   const [clientInfo, setClientInfo] = useState<ClientInfo | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchClientInfo = async () => {
-      try {
-        const response = await axios.get('https://ipapi.co/json/');
-        console.log(response)
-        setClientInfo(response.data);
-      } catch (error) {
-        console.error('Error fetching client info:', error);
-      }
-    };
-
-    fetchClientInfo();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    // Fetch client info using ipgeolocation API during form submission
     try {
+      const clientResponse = await axios.get(`https://api.ipgeolocation.io/ipgeo?apiKey=${IPGEOLOCATION_API_KEY}`);
+      setClientInfo({
+        ip: clientResponse.data.ip,
+        city: clientResponse.data.city,
+        region: clientResponse.data.state_prov,
+        country_name: clientResponse.data.country_name,
+        org: clientResponse.data.organization,
+        latitude: parseFloat(clientResponse.data.latitude),
+        longitude: parseFloat(clientResponse.data.longitude)
+      });
+      console.log(clientResponse);
+
       const deviceInfo = {
         os: navigator.platform,
         browser: navigator.userAgent,
@@ -58,33 +58,23 @@ function Login({ onLogin }: LoginProps) {
       const response = await axios.post(`${API_BASE_URL}/api/login`, {
         email,
         password,
-        clientInfo,
+        clientInfo: clientResponse.data, // Use fetched client info
         deviceInfo,
       });
 
       if (response.data && response.data.token) {
-        // Store the token in localStorage
         localStorage.setItem('token', response.data.token);
-        
-        // Call the onLogin function with the token
         onLogin(response.data.token);
-
-        // Navigate to the home page
         navigate('/');
       } else {
-        // If there's no token in the response, throw an error
         throw new Error("Login successful, but no token received");
       }
     } catch (error: any) {
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         setError(error.response.data?.error || "Login failed");
       } else if (error.request) {
-        // The request was made but no response was received
         setError("No response from server. Please try again.");
       } else {
-        // Something happened in setting up the request that triggered an Error
         setError(error.message || "An unexpected error occurred");
       }
     } finally {

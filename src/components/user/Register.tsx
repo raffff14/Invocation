@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import zxcvbn from "zxcvbn";
 
 // For Vite, use import.meta.env instead of process.env
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const IPGEOLOCATION_API_KEY = import.meta.env.VITE_IPGEOLOCATION_API_KEY; // Ensure you have this in your environment variables
 
 interface RegisterProps {
   onRegister: (token: string) => void;
@@ -25,43 +26,47 @@ function Register({ onRegister }: RegisterProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [birthday, setBirthday] = useState("");
+  const [gender, setGender] = useState("");
+  const [number, setNumber] = useState("");
+  const [address, setAddress] = useState("");
   const [error, setError] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [clientInfo, setClientInfo] = useState<ClientInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchClientInfo = async () => {
-      try {
-        const response = await axios.get('https://ipapi.co/json/');
-        setClientInfo(response.data);
-      } catch (error) {
-        console.error('Error fetching client info:', error);
-      }
-    };
-
-    fetchClientInfo();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
-    if (passwordStrength < 3) {
-      setError("Password is too weak. Please choose a stronger password.");
-      setLoading(false);
-      return;
-    }
-
+    // Fetch client info using ipgeolocation API during form submission
     try {
+      const clientResponse = await axios.get(`https://api.ipgeolocation.io/ipgeo?apiKey=${IPGEOLOCATION_API_KEY}`);
+      setClientInfo({
+        ip: clientResponse.data.ip,
+        city: clientResponse.data.city,
+        region: clientResponse.data.state_prov,
+        country_name: clientResponse.data.country_name,
+        org: clientResponse.data.organization,
+        latitude: parseFloat(clientResponse.data.latitude),
+        longitude: parseFloat(clientResponse.data.longitude)
+      });
+      console.log(clientResponse);
+
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        setLoading(false);
+        return;
+      }
+
+      if (passwordStrength < 3) {
+        setError("Password is too weak. Please choose a stronger password.");
+        setLoading(false);
+        return;
+      }
+
       const deviceInfo = {
         os: navigator.platform,
         browser: navigator.userAgent,
@@ -74,46 +79,38 @@ function Register({ onRegister }: RegisterProps) {
         name,
         email,
         password,
-        clientInfo,
+        birthday,
+        gender,
+        number,
+        address: address,
+        clientInfo: clientResponse.data, // Use fetched client info
         deviceInfo,
         registrationDate: new Date().toISOString(),
       });
 
       if (response.data && response.data.token) {
-        // Store the token in localStorage
         localStorage.setItem('token', response.data.token);
-        
-        // Call the onRegister function with the token
         onRegister(response.data.token);
-
-        // Navigate to the home page
         navigate('/');
       } else {
-        // If there's no token in the response, throw an error
         throw new Error("Registration successful, but no token received");
       }
     } catch (error: any) {
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         setError(error.response.data?.error || "Registration failed");
       } else if (error.request) {
-        // The request was made but no response was received
         setError("No response from server. Please try again.");
       } else {
-        // Something happened in setting up the request that triggered an Error
         setError(error.message || "An unexpected error occurred");
       }
     } finally {
       setLoading(false);
     }
   };
-
   const checkPasswordStrength = (password: string) => {
     const result = zxcvbn(password);
     setPasswordStrength(result.score);
   };
-
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
@@ -187,6 +184,62 @@ function Register({ onRegister }: RegisterProps) {
               id="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-black bg-white"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="birthday" className="block text-sm font-medium text-gray-700">
+              Birthday
+            </label>
+            <input
+              type="date"
+              id="birthday"
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-black bg-white"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+              Gender
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-black bg-white"
+              required
+            >
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="number" className="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="number"
+              value={number}
+              onChange={(e) => setNumber(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-black bg-white"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+              Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-black bg-white"
               required
             />
